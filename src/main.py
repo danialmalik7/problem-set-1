@@ -12,17 +12,20 @@ import calibration_plot
 
 # Call functions / instanciate objects from the .py files
 def main():
+    # PART 1
+    etl.run_etl()
 
-    # PART 1: Instanciate etl, saving the two datasets in `./data/`
+    # PART 2
+    preprocessing.run_preprocessing()
 
-    # PART 2: Call functions/instanciate objects from preprocessing
+    # PART 3
+    logistic_regression.run_logistic_regression()
 
-    # PART 3: Call functions/instanciate objects from logistic_regression
+    # PART 4
+    decision_tree.run_decision_tree()
 
-    # PART 4: Call functions/instanciate objects from decision_tree
-
-    # PART 5: Call functions/instanciate objects from calibration_plot
-
+    # PART 5
+    calibration_plot.run_calibration_plots()
 
 if __name__ == "__main__":
     main()

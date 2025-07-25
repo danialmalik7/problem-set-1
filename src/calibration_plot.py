@@ -12,34 +12,43 @@ Compute AUC for the decision tree model
 Do both metrics agree that one model is more accurate than the other? Print this question and your answer. 
 '''
 
-# Import any further packages you may need for PART 5
+import pandas as pd
 from sklearn.calibration import calibration_curve
+from sklearn.metrics import roc_auc_score
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-# Calibration plot function 
+# Calibration plot function
 def calibration_plot(y_true, y_prob, n_bins=10):
-    """
-    Create a calibration plot with a 45-degree dashed line.
-
-    Parameters:
-        y_true (array-like): True binary labels (0 or 1).
-        y_prob (array-like): Predicted probabilities for the positive class.
-        n_bins (int): Number of bins to divide the data for calibration.
-
-    Returns:
-        None
-    """
-    #Calculate calibration values
-    bin_means, prob_true = calibration_curve(y_true, y_prob, n_bins=n_bins)
-    
-    #Create the Seaborn plot
+    prob_true, prob_pred = calibration_curve(y_true, y_prob, n_bins=n_bins)
     sns.set(style="whitegrid")
     plt.plot([0, 1], [0, 1], "k--")
-    plt.plot(prob_true, bin_means, marker='o', label="Model")
-    
+    plt.plot(prob_pred, prob_true, marker='o', label="Model")
     plt.xlabel("Mean Predicted Probability")
     plt.ylabel("Fraction of Positives")
     plt.title("Calibration Plot")
     plt.legend(loc="best")
     plt.show()
+
+def run_calibration_plots():
+    df = pd.read_csv('data/test_dt.csv')
+    y_true = df['y']
+    pred_lr = df['pred_lr']
+    pred_dt = df['pred_dt']
+
+    print("Calibration plot for Logistic Regression:")
+    calibration_plot(y_true, pred_lr, n_bins=5)
+
+    print("Calibration plot for Decision Tree:")
+    calibration_plot(y_true, pred_dt, n_bins=5)
+
+    # Extra Credit
+    top_50_lr = df.sort_values('pred_lr', ascending=False).head(50)
+    top_50_dt = df.sort_values('pred_dt', ascending=False).head(50)
+    print(f"PPV (Top 50) Logistic Regression: {round(top_50_lr['y'].mean(), 3)}")
+    print(f"PPV (Top 50) Decision Tree: {round(top_50_dt['y'].mean(), 3)}")
+    print(f"AUC Logistic Regression: {round(roc_auc_score(y_true, pred_lr), 3)}")
+    print(f"AUC Decision Tree: {round(roc_auc_score(y_true, pred_dt), 3)}")
+
+if __name__ == "__main__":
+    run_calibration_plots()
